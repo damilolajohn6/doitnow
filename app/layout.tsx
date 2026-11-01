@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import StructuredData from '@/components/StructuredData';
 import { ScrollProgress } from '@/components/MotionPrimitives';
 import { absoluteUrl, getBaseUrl } from '@/lib/site';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const brandFont = localFont({
   src: [
@@ -132,6 +133,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <Header />
         <main>{children}</main>
         <Footer />
+        <SpeedInsights />
       </body>
     </html>
   );
