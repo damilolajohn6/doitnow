@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowUpRight, Download, Layers3, Lamp, Mail, MapPin, Phone, Ruler } from 'lucide-react';
 import DesignExplorer from '@/components/DesignExplorer';
 import SpatialHero from '@/components/SpatialHero';
-import DownloadCentre from '@/components/DownloadCentre';
+// import DownloadCentre from '@/components/DownloadCentre';
 import EnquiryForm from '@/components/EnquiryForm';
 import { designs, getDesign } from '@/lib/designs';
 import StructuredData from '@/components/StructuredData';
@@ -182,7 +182,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
       </section>
 
-      <section className="section downloads-section" id="downloads">
+      {/* <section className="section downloads-section" id="downloads">
         <div className="container">
           <div className="section-heading-row">
             <SectionHeading
@@ -196,7 +196,7 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
           <DownloadCentre />
         </div>
-      </section>
+      </section> */}
 
       <section className="section contact-section" id="contact">
         <div className="container contact-grid">
