@@ -128,9 +128,9 @@ export default function PaletteStudio() {
             </ul>
           </motion.div>
         </AnimatePresence>
-        <small className="palette-note">
+        {/* <small className="palette-note">
           Digital colours are indicative. Review physical samples together in the room’s real light.
-        </small>
+        </small> */}
       </div>
     </div>
   );
