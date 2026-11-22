@@ -1,3 +1,8 @@
+const remotePatterns = [{ protocol: 'https', hostname: '**.public.blob.vercel-storage.com' }];
+if (process.env.S3_PUBLIC_BASE_URL?.startsWith('https://')) {
+  remotePatterns.push({ protocol: 'https', hostname: new URL(process.env.S3_PUBLIC_BASE_URL).hostname });
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -6,6 +11,7 @@ const nextConfig = {
   allowedDevOrigins: ['*.e2b.app', '127.0.0.1', 'localhost'],
   images: {
     formats: ['image/avif', 'image/webp'],
+    remotePatterns,
   },
   async headers() {
     return [

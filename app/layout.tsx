@@ -1,13 +1,18 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import localFont from 'next/font/local';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
+import './advanced.css';
+import './product.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import WhatsAppFloat from '@/components/WhatsAppFloat';
+import ConciergeFloat from '@/components/ConciergeFloat';
 import StructuredData from '@/components/StructuredData';
 import { ScrollProgress } from '@/components/MotionPrimitives';
 import { absoluteUrl, getBaseUrl } from '@/lib/site';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const brandFont = localFont({
   src: [
@@ -133,7 +138,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <Header />
         <main>{children}</main>
         <Footer />
-        <SpeedInsights />
+        <ConciergeFloat />
+        <WhatsAppFloat />
+            <Analytics />
+            <SpeedInsights />
+        
       </body>
     </html>
   );

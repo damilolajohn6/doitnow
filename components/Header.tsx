@@ -54,7 +54,7 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <Link href="/contact#enquire" className="button button-small nav-cta">
+        <Link href="/studio" className="button button-small nav-cta">
           Start a project <ArrowUpRight size={17} aria-hidden="true" />
         </Link>
         <button
@@ -81,7 +81,7 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
-          <Link href="/contact#enquire" className="button" onClick={() => setOpen(false)}>
+          <Link href="/studio" className="button" onClick={() => setOpen(false)}>
             Start a project <ArrowUpRight size={18} />
           </Link>
         </nav>

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { getDesign } from './designs';
 
 export const projectTypes = [
   'Wardrobes',
@@ -14,6 +13,8 @@ export const projectTypes = [
   'Multiple Spaces',
   'Other',
 ] as const;
+
+export const bookingServices = ['Design consultation', 'Site measurement', 'Project review'] as const;
 
 const phonePattern = /^[+0-9][0-9\s()-]{6,29}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,7 +41,7 @@ export const enquirySchema = z
       .trim()
       .max(120)
       .default('')
-      .refine((value) => !value || Boolean(getDesign(value)), 'Select a valid design.'),
+      .refine((value) => !value || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), 'Select a valid design.'),
     preferredContact: z.enum(['Phone', 'Email']).default('Phone'),
     message: z
       .string()
@@ -58,6 +59,27 @@ export const enquirySchema = z
       });
     }
   });
+
+export const studioBriefSchema = z.object({
+  rooms: z.array(z.string().trim().min(2).max(80)).max(10).default([]),
+  dimensions: z.string().trim().max(2000).default(''),
+  budget: z.string().trim().max(100).default(''),
+  timeline: z.string().trim().max(100).default(''),
+  styles: z.array(z.string().trim().min(2).max(100)).max(10).default([]),
+  favourites: z
+    .array(
+      z
+        .string()
+        .regex(/^[a-z0-9-]+$/)
+        .max(90),
+    )
+    .max(6)
+    .default([]),
+  configuration: z
+    .record(z.string(), z.unknown())
+    .default({})
+    .refine((value) => JSON.stringify(value).length <= 5000),
+});
 
 export type EnquiryFormInput = z.infer<typeof enquirySchema>;
 

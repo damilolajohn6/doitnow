@@ -856,6 +856,14 @@
     @apply mt-12 flex items-center justify-between gap-5 border-t border-white/10 pt-6 text-xs text-greige;
   }
 
+  .whatsapp-float {
+    @apply fixed bottom-5 right-5 z-[60] inline-flex h-14 items-center justify-center gap-2.5 rounded-full border border-white/40 bg-[#25d366] px-5 text-sm font-bold text-[#103b22] shadow-xl transition duration-200 hover:-translate-y-1 hover:bg-[#1fbd59];
+  }
+
+  .whatsapp-float svg {
+    @apply h-7 w-7 shrink-0;
+  }
+
   .not-found {
     @apply flex min-h-[65vh] items-center py-20;
   }
@@ -2158,6 +2166,12 @@
   }
   .contact-alternate-line {
     @apply flex-wrap;
+  }
+  .whatsapp-float {
+    @apply bottom-4 right-4 w-14 px-0;
+  }
+  .whatsapp-float span {
+    @apply hidden;
   }
 }
 

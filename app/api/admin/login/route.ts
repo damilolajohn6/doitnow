@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { adminCookieName, createSessionToken, sessionDurationSeconds, verifyAdminPassword } from '@/lib/auth';
+import { authenticateAdminUser } from '@/lib/admin-users';
 import { checkRateLimit, requestKey } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
@@ -19,15 +20,37 @@ export async function POST(request: Request) {
     );
   }
   try {
-    const body = (await request.json()) as { password?: unknown };
-    if (typeof body.password !== 'string' || !verifyAdminPassword(body.password)) {
+    const body = (await request.json()) as { email?: unknown; password?: unknown; code?: unknown };
+    if (typeof body.password !== 'string') {
+      return Response.json({ ok: false, message: 'Enter your admin password.' }, { status: 400 });
+    }
+    const email = typeof body.email === 'string' ? body.email.trim() : '';
+    let identity: { sub: string; role: 'owner' | 'manager'; email: string } = {
+      sub: 'admin',
+      role: 'owner',
+      email: 'environment-owner',
+    };
+    if (email) {
+      const user = await authenticateAdminUser(
+        email,
+        body.password,
+        typeof body.code === 'string' ? body.code : '',
+      );
+      if (!user) {
+        return Response.json(
+          { ok: false, message: 'The email, password or authenticator code is incorrect.' },
+          { status: 401, headers: { 'Cache-Control': 'no-store' } },
+        );
+      }
+      identity = { sub: `admin-user:${user.id}`, role: user.role, email: user.email };
+    } else if (!verifyAdminPassword(body.password)) {
       return Response.json(
         { ok: false, message: 'The password is incorrect or admin access is not configured.' },
         { status: 401, headers: { 'Cache-Control': 'no-store' } },
       );
     }
     const store = await cookies();
-    store.set(adminCookieName, createSessionToken(), {
+    store.set(adminCookieName, createSessionToken(identity), {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',

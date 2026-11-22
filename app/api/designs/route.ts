@@ -1,6 +1,8 @@
-import { designs, isCategory } from '@/lib/designs';
+import { getCatalogueDesigns } from '@/lib/catalogue';
+import { isCategory } from '@/lib/designs';
 
-export function GET(request: Request) {
+export async function GET(request: Request) {
+  const designs = await getCatalogueDesigns();
   const parameters = new URL(request.url).searchParams;
   const requestedCategory = parameters.get('category') || 'All';
   const category = isCategory(requestedCategory) ? requestedCategory : 'All';

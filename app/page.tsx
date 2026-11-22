@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { ArrowUpRight, Download, Layers3, Lamp, Mail, MapPin, Phone, Ruler } from 'lucide-react';
 import DesignExplorer from '@/components/DesignExplorer';
 import SpatialHero from '@/components/SpatialHero';
-// import DownloadCentre from '@/components/DownloadCentre';
+import DownloadCentre from '@/components/DownloadCentre';
 import EnquiryForm from '@/components/EnquiryForm';
-import { designs, getDesign } from '@/lib/designs';
+import { getCatalogueDesigns } from '@/lib/catalogue';
 import StructuredData from '@/components/StructuredData';
 import { absoluteUrl } from '@/lib/site';
 
@@ -29,8 +29,8 @@ function SectionHeading({ kicker, title, copy }: { kicker: string; title: string
 type HomeProps = { searchParams: Promise<{ design?: string; q?: string }> };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const parameters = await searchParams;
-  const initialDesign = getDesign(parameters.design || '')?.slug || '';
+  const [parameters, designs] = await Promise.all([searchParams, getCatalogueDesigns()]);
+  const initialDesign = designs.find((item) => item.slug === parameters.design)?.slug || '';
   const initialQuery = parameters.q?.slice(0, 80) || '';
   const itemList = {
     '@context': 'https://schema.org',
@@ -80,7 +80,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <span>catalogue pages</span>
           </div>
           <div>
-            <strong>26</strong>
+            <strong>{designs.length}</strong>
             <span>web design directions</span>
           </div>
           <div>
@@ -88,6 +88,55 @@ export default async function Home({ searchParams }: HomeProps) {
             <span>Nigerian locations</span>
           </div>
           <div className="proof-tagline">DESIGN. BUILD. DELIVER.</div>
+        </div>
+      </section>
+
+      <section className="section advanced-tools-section">
+        <div className="container">
+          <SectionHeading
+            kicker="CONNECTED PROJECT TOOLS"
+            title="Move from inspiration to a real project."
+            copy="Use the catalogue as a starting point, then build a brief, explore live 3D geometry, book time and follow the project securely."
+          />
+          <div className="advanced-tools-grid">
+            {[
+              [
+                '01',
+                'Smart Project Studio',
+                'Dimensions, shortlist, uploads and a downloadable project brief.',
+                '/studio',
+              ],
+              [
+                '02',
+                '3D configurator',
+                'Adjust wardrobe and TV-wall geometry, finishes and shelving.',
+                '/configurator',
+              ],
+              ['03', 'Consultation booking', 'Reserve, reschedule or cancel a design conversation.', '/book'],
+              ['04', 'Customer portal', 'Track stages, documents, approvals and appointments.', '/portal'],
+              [
+                '05',
+                'Design concierge',
+                'Get guidance grounded in the verified published catalogue.',
+                '/concierge',
+              ],
+              [
+                '06',
+                'Project stories',
+                'Review genuine before-and-after evidence when published.',
+                '/stories',
+              ],
+            ].map(([number, title, copy, href]) => (
+              <Link href={href} className="advanced-tool-card" key={href}>
+                <span>{number}</span>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+                <strong>
+                  Open tool <ArrowUpRight size={15} />
+                </strong>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -182,13 +231,13 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
       </section>
 
-      {/* <section className="section downloads-section" id="downloads">
+      <section className="section downloads-section" id="downloads">
         <div className="container">
           <div className="section-heading-row">
             <SectionHeading
               kicker="CATALOGUE + PRINT CENTRE"
               title="Take the designs with you."
-              copy="Open the catalogue or download the A4, A3, flyer, business-card and logo packages for your next conversation or print workflow."
+              copy="Open the catalogue or download the catalogue."
             />
             <span className="download-heading-icon">
               <Download size={32} />
@@ -196,7 +245,7 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
           <DownloadCentre />
         </div>
-      </section> */}
+      </section>
 
       <section className="section contact-section" id="contact">
         <div className="container contact-grid">

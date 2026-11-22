@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import EnquiryDashboard from '@/components/EnquiryDashboard';
+import AdminNav from '@/components/AdminNav';
 import { isAdminAuthenticated } from '@/lib/auth';
 import { listEnquiries } from '@/lib/enquiries';
 
@@ -13,5 +14,10 @@ export const metadata: Metadata = {
 
 export default async function AdminPage() {
   if (!(await isAdminAuthenticated())) redirect('/admin/login');
-  return <EnquiryDashboard initialEnquiries={await listEnquiries()} />;
+  return (
+    <>
+      <AdminNav />
+      <EnquiryDashboard initialEnquiries={await listEnquiries()} />
+    </>
+  );
 }

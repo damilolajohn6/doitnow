@@ -17,10 +17,16 @@ export default function Footer() {
           <h2>Explore</h2>
           <div className="footer-links">
             <Link href="/designs">Design catalogue</Link>
+            <Link href="/stories">Project stories</Link>
             <Link href="/services">Services</Link>
             <Link href="/about">About Do It Now</Link>
             <Link href="/process">Our process</Link>
-            {/* <Link href="/#downloads">Print downloads</Link> */}
+            <Link href="/#downloads">Print downloads</Link>
+            <Link href="/studio">Smart Project Studio</Link>
+            <Link href="/configurator">3D configurator</Link>
+            <Link href="/book">Book a consultation</Link>
+            <Link href="/portal">Customer portal</Link>
+            <Link href="/concierge">Design concierge</Link>
             <Link href="/contact#enquire">Project enquiry</Link>
           </div>
         </div>

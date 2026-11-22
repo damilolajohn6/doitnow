@@ -5,7 +5,8 @@ import DesignExplorer from '@/components/DesignExplorer';
 import { Reveal } from '@/components/MotionPrimitives';
 import PageSchema from '@/components/PageSchema';
 import SpatialHero from '@/components/SpatialHero';
-import { categories, designs } from '@/lib/designs';
+import { getCatalogueDesigns } from '@/lib/catalogue';
+import { categories } from '@/lib/designs';
 import { absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -20,19 +21,21 @@ export const metadata: Metadata = {
   },
 };
 
-const catalogueList = {
-  '@type': 'ItemList',
-  numberOfItems: designs.length,
-  itemListElement: designs.map((design, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    name: design.title,
-    url: absoluteUrl(`/designs/${design.slug}`),
-    image: absoluteUrl(design.image),
-  })),
-};
+export const revalidate = 60;
 
-export default function DesignsPage() {
+export default async function DesignsPage() {
+  const designs = await getCatalogueDesigns();
+  const catalogueList = {
+    '@type': 'ItemList',
+    numberOfItems: designs.length,
+    itemListElement: designs.map((design, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: design.title,
+      url: absoluteUrl(`/designs/${design.slug}`),
+      image: absoluteUrl(design.image),
+    })),
+  };
   return (
     <>
       <PageSchema
@@ -60,11 +63,11 @@ export default function DesignsPage() {
         sceneHref="/designs/soft-curves-warm-neutrals"
         sceneLinkLabel="Open this direction"
         primaryHref="#catalogue"
-        primaryLabel="Explore all 26"
+        primaryLabel={`Explore all ${designs.length}`}
         secondaryHref="/about"
         secondaryLabel="Our point of view"
         stats={[
-          { value: '26', label: 'design directions' },
+          { value: String(designs.length), label: 'design directions' },
           { value: String(categories.length - 1), label: 'space categories' },
           { value: '6', label: 'kitchen studies' },
         ]}

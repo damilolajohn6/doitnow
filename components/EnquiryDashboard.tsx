@@ -28,6 +28,8 @@ export default function EnquiryDashboard({ initialEnquiries }: { initialEnquirie
   const [query, setQuery] = useState('');
   const [updating, setUpdating] = useState('');
   const [message, setMessage] = useState('');
+  const [page, setPage] = useState(1);
+  const pageSize = 25;
 
   const counts = useMemo(
     () => ({
@@ -58,6 +60,9 @@ export default function EnquiryDashboard({ initialEnquiries }: { initialEnquirie
         .includes(needle);
     });
   }, [filter, items, query]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   async function updateStatus(id: string, status: EnquiryStatus) {
     setUpdating(id);
@@ -165,7 +170,10 @@ export default function EnquiryDashboard({ initialEnquiries }: { initialEnquirie
             <input
               type="search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setPage(1);
+              }}
               placeholder="Search name, reference, location…"
               aria-label="Search enquiries"
             />
@@ -176,7 +184,10 @@ export default function EnquiryDashboard({ initialEnquiries }: { initialEnquirie
                 key={status}
                 type="button"
                 className={filter === status ? 'active' : ''}
-                onClick={() => setFilter(status)}
+                onClick={() => {
+                  setFilter(status);
+                  setPage(1);
+                }}
                 aria-pressed={filter === status}
               >
                 {status === 'all' ? 'All enquiries' : status}
@@ -191,64 +202,93 @@ export default function EnquiryDashboard({ initialEnquiries }: { initialEnquirie
         )}
 
         {filtered.length ? (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Client</th>
-                  <th>Project</th>
-                  <th>Brief</th>
-                  <th>Received</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <strong>{item.name}</strong>
-                      <span className="admin-reference">{item.reference}</span>
-                      {item.phone && <a href={`tel:${item.phone}`}>{item.phone}</a>}
-                      {item.email && <a href={`mailto:${item.email}`}>{item.email}</a>}
-                      {item.location && <span>{item.location}</span>}
-                    </td>
-                    <td>
-                      <strong>{item.projectType}</strong>
-                      {item.design && <span>{item.design.replace(/-/g, ' ')}</span>}
-                      <span>Prefer {item.preferredContact.toLowerCase()}</span>
-                    </td>
-                    <td>
-                      <details>
-                        <summary>Read project brief</summary>
-                        <p>{item.message}</p>
-                      </details>
-                    </td>
-                    <td>
-                      <time dateTime={item.createdAt}>{formatDate(item.createdAt)}</time>
-                    </td>
-                    <td>
-                      <div className="status-control">
-                        {updating === item.id && <LoaderCircle className="spin" size={16} />}
-                        <select
-                          className={`status-${item.status}`}
-                          value={item.status}
-                          disabled={updating === item.id}
-                          onChange={(event) => updateStatus(item.id, event.target.value as EnquiryStatus)}
-                          aria-label={`Status for ${item.reference}`}
-                        >
-                          {statusOptions.map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </td>
+          <>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th>Project</th>
+                    <th>Brief</th>
+                    <th>Received</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {paginated.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <strong>{item.name}</strong>
+                        <span className="admin-reference">{item.reference}</span>
+                        {item.phone && <a href={`tel:${item.phone}`}>{item.phone}</a>}
+                        {item.email && <a href={`mailto:${item.email}`}>{item.email}</a>}
+                        {item.location && <span>{item.location}</span>}
+                      </td>
+                      <td>
+                        <strong>{item.projectType}</strong>
+                        {item.design && <span>{item.design.replace(/-/g, ' ')}</span>}
+                        <span>Prefer {item.preferredContact.toLowerCase()}</span>
+                      </td>
+                      <td>
+                        <details>
+                          <summary>Read project brief</summary>
+                          <p>{item.message}</p>
+                        </details>
+                      </td>
+                      <td>
+                        <time dateTime={item.createdAt}>{formatDate(item.createdAt)}</time>
+                      </td>
+                      <td>
+                        <div className="status-control">
+                          {updating === item.id && <LoaderCircle className="spin" size={16} />}
+                          <select
+                            className={`status-${item.status}`}
+                            value={item.status}
+                            disabled={updating === item.id}
+                            onChange={(event) => updateStatus(item.id, event.target.value as EnquiryStatus)}
+                            aria-label={`Status for ${item.reference}`}
+                          >
+                            {statusOptions.map((status) => (
+                              <option key={status} value={status}>
+                                {status}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <nav className="admin-pagination" aria-label="Enquiry pages">
+              <span>
+                Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filtered.length)}{' '}
+                of {filtered.length}
+              </span>
+              <div>
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  disabled={currentPage === 1}
+                  onClick={() => setPage(currentPage - 1)}
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setPage(currentPage + 1)}
+                >
+                  Next
+                </button>
+              </div>
+            </nav>
+          </>
         ) : (
           <div className="empty-state admin-empty">
             <Inbox size={38} />

@@ -22,6 +22,10 @@ test('all five core pages have unique content, metadata, active navigation and w
     await expect(page.getByRole('heading', { level: 1 })).toContainText(item.heading);
     await expect(page.locator('.spatial-scene')).toBeVisible();
     await expect(page.locator('.desktop-nav a.active')).toHaveText(item.label);
+    const whatsapp = page.getByRole('link', { name: 'Chat with Do It Now on WhatsApp' });
+    await expect(whatsapp).toBeVisible();
+    await expect(whatsapp).toHaveAttribute('href', /^https:\/\/wa\.me\/2347017176611\?text=/);
+    await expect(whatsapp).toHaveAttribute('target', '_blank');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`${item.path}$`));
     const structuredData = await page.locator('script[type="application/ld+json"]').allTextContents();
     expect(structuredData.some((script) => script.includes(`"@type":"${item.schema}"`))).toBe(true);

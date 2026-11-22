@@ -70,6 +70,10 @@ test('mobile navigation opens, closes and has no horizontal overflow', async ({ 
     content: document.documentElement.scrollWidth,
   }));
   expect(dimensions.content).toBe(dimensions.viewport);
+  const whatsapp = page.getByRole('link', { name: 'Chat with Do It Now on WhatsApp' });
+  await expect(whatsapp).toBeVisible();
+  await expect(whatsapp).toHaveAttribute('href', /^https:\/\/wa\.me\/2347017176611\?text=/);
+  await expect(whatsapp.locator('span')).toBeHidden();
 });
 
 test('all 26 design pages and SEO routes are available', async ({ request }) => {
@@ -86,7 +90,7 @@ test('all 26 design pages and SEO routes are available', async ({ request }) => 
   for (const path of ['/designs', '/services', '/about', '/process', '/contact']) {
     expect(sitemapXml).toContain(`${path}</loc>`);
   }
-  expect((sitemapXml.match(/<loc>/g) || []).length).toBe(32);
+  expect((sitemapXml.match(/<loc>/g) || []).length).toBe(37);
   for (const design of designs) expect(sitemapXml).toContain(`/designs/${design.slug}</loc>`);
 
   const robots = await request.get('/robots.txt');
@@ -110,7 +114,13 @@ test('all 26 design pages and SEO routes are available', async ({ request }) => 
 test('health, validation, honeypot and rate-limit APIs behave safely', async ({ request }) => {
   const health = await request.get('/api/health');
   expect(health.status()).toBe(200);
-  expect(await health.json()).toEqual({ ok: true, service: 'Do It Now web', designs: 26, downloads: 6 });
+  expect(await health.json()).toEqual({
+    ok: true,
+    service: 'Do It Now web',
+    designs: 26,
+    downloads: 6,
+    storage: 'local',
+  });
 
   const invalid = await request.post('/api/enquiries', {
     headers: { 'x-forwarded-for': '198.51.100.10' },

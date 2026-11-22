@@ -1,6 +1,8 @@
 import { designs } from '@/lib/designs';
 import { downloadAssets } from '@/lib/downloads';
 import { checkEnquiryStore } from '@/lib/enquiries';
+import { ensurePlatformSchema } from '@/lib/platform-store';
+import { s3ConfigurationError, s3Configured } from '@/lib/s3-storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +22,7 @@ function vercelConfigurationError() {
 }
 
 export async function GET() {
-  const configurationError = vercelConfigurationError();
+  const configurationError = vercelConfigurationError() || s3ConfigurationError();
   if (configurationError) {
     return Response.json(
       { ok: false, service: 'Do It Now web', message: configurationError },
@@ -29,8 +31,15 @@ export async function GET() {
   }
   try {
     await checkEnquiryStore();
+    await ensurePlatformSchema();
     return Response.json(
-      { ok: true, service: 'Do It Now web', designs: designs.length, downloads: downloadAssets.length },
+      {
+        ok: true,
+        service: 'Do It Now web',
+        designs: designs.length,
+        downloads: downloadAssets.length,
+        storage: s3Configured() ? 's3-compatible' : process.env.VERCEL === '1' ? 'vercel-blob' : 'local',
+      },
       { headers: { 'Cache-Control': 'no-store' } },
     );
   } catch {

@@ -1,4 +1,5 @@
-import { isAdminAuthenticated } from '@/lib/auth';
+import { getAdminSession } from '@/lib/auth';
+import { recordAudit } from '@/lib/catalogue';
 import { enquiryStatuses, updateEnquiryStatus } from '@/lib/enquiries';
 import type { EnquiryStatus } from '@/lib/enquiries';
 import { checkRateLimit, requestKey } from '@/lib/rate-limit';
@@ -8,7 +9,8 @@ export const runtime = 'nodejs';
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, context: RouteContext) {
-  if (!(await isAdminAuthenticated())) {
+  const session = await getAdminSession();
+  if (!session) {
     return Response.json(
       { ok: false, message: 'Authentication required.' },
       { status: 401, headers: { 'Cache-Control': 'no-store' } },
@@ -43,6 +45,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         { status: 404, headers: { 'Cache-Control': 'no-store' } },
       );
     }
+    await recordAudit(session.email, 'Updated enquiry status', id, String(enquiry.status));
     return Response.json({ ok: true, enquiry }, { headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return Response.json(

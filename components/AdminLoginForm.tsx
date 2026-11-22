@@ -6,7 +6,9 @@ import { LoaderCircle, LockKeyhole } from 'lucide-react';
 
 export default function AdminLoginForm() {
   const router = useRouter();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -18,7 +20,7 @@ export default function AdminLoginForm() {
       const response = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password, code }),
       });
       const data = (await response.json()) as { ok: boolean; message?: string };
       if (!response.ok || !data.ok) {
@@ -41,12 +43,22 @@ export default function AdminLoginForm() {
       </span>
       <span className="section-kicker">PROTECTED DASHBOARD</span>
       <h1>Enquiry administration</h1>
-      <p>Sign in to review project briefs and update their follow-up status.</p>
+      <p>Use the primary owner password, or enter your team email and authenticator code if enabled.</p>
       {message && (
         <div className="form-error" role="alert">
           {message}
         </div>
       )}
+      <div className="field">
+        <label htmlFor="admin-email">Team email (optional for primary owner)</label>
+        <input
+          id="admin-email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          autoComplete="username"
+        />
+      </div>
       <div className="field">
         <label htmlFor="admin-password">Admin password</label>
         <input
@@ -56,6 +68,19 @@ export default function AdminLoginForm() {
           onChange={(event) => setPassword(event.target.value)}
           autoComplete="current-password"
           required
+        />
+      </div>
+      <div className="field">
+        <label htmlFor="admin-code">Authenticator code (if enabled)</label>
+        <input
+          id="admin-code"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]{6}"
+          maxLength={6}
+          value={code}
+          onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
+          autoComplete="one-time-code"
         />
       </div>
       <button className="button form-submit" type="submit" disabled={pending || !password}>

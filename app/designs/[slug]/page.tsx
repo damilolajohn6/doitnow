@@ -6,7 +6,8 @@ import { ArrowLeft, ArrowUpRight, Layers3, Lamp, Ruler } from 'lucide-react';
 import DesignCard from '@/components/DesignCard';
 import { Reveal } from '@/components/MotionPrimitives';
 import StructuredData from '@/components/StructuredData';
-import { designs, getDesign } from '@/lib/designs';
+import { getCatalogueDesign, getCatalogueDesigns } from '@/lib/catalogue';
+import { designs } from '@/lib/designs';
 import { absoluteUrl } from '@/lib/site';
 
 type DesignPageProps = { params: Promise<{ slug: string }> };
@@ -17,7 +18,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: DesignPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const design = getDesign(slug);
+  const design = await getCatalogueDesign(slug);
   if (!design) return { title: 'Design not found', robots: { index: false, follow: false } };
   return {
     title: design.title,
@@ -27,16 +28,16 @@ export async function generateMetadata({ params }: DesignPageProps): Promise<Met
       title: `${design.title} | Do It Now`,
       description: design.summary,
       url: `/designs/${design.slug}`,
-      images: [{ url: design.image, alt: design.alt }],
+      images: [{ url: `/designs/${design.slug}/opengraph-image`, alt: design.alt }],
     },
   };
 }
 
 export default async function DesignPage({ params }: DesignPageProps) {
   const { slug } = await params;
-  const design = getDesign(slug);
+  const design = await getCatalogueDesign(slug);
   if (!design) notFound();
-  const related = designs
+  const related = (await getCatalogueDesigns())
     .filter((item) => item.slug !== design.slug)
     .sort((a, b) => Number(b.category === design.category) - Number(a.category === design.category))
     .slice(0, 3);
