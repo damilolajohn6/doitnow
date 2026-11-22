@@ -13,8 +13,6 @@ import ConciergeFloat from '@/components/ConciergeFloat';
 import StructuredData from '@/components/StructuredData';
 import { ScrollProgress } from '@/components/MotionPrimitives';
 import { absoluteUrl, getBaseUrl } from '@/lib/site';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { Analytics } from '@vercel/analytics/next';
 
 const brandFont = localFont({
   src: [
