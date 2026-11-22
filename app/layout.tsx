@@ -138,6 +138,8 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <Header />
         <main>{children}</main>
         <Footer />
+        <ConciergeFloat />
+        <WhatsAppFloat />
         <SpeedInsights />
         <Analytics />
       </body>
